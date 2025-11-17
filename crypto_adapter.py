@@ -58,6 +58,8 @@ class CryptoAdapter:
         if self.algorithm == 'KYBER':
             raise RuntimeError('derive_shared_secret not valid for KYBER; use encapsulate/decapsulate')
         peer_point = self._parse_point(peer_pub)
+        if not self._backend.curve.is_on_curve(peer_point):
+            raise RuntimeError('Received invalid peer public key, not on curve')
         # cryptlib ECDH derive_shared_secret(private_scalar, peer_public_point)
         shared = self._backend.derive_shared_secret(self._priv_scalar, peer_point)
         # shared may be an int or bytes; normalize to bytes
